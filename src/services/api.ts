@@ -6,7 +6,7 @@ export interface TravelFormData {
   days: number;
   startLocation: string;
   endLocation: string;
-  travelMode: string;
+  travelMode: string[];
   interests: string[];
 }
 
