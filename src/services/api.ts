@@ -71,7 +71,9 @@ Please create a detailed travel itinerary.`;
       messages: [
         {
           role: "system",
-          content: `You are an expert travel planner that creates comprehensive, detailed travel itineraries with multiple locations, activities, and realistic timing.
+          content: `🌟 CURRENT SYSTEM PROMPT BEING USED:
+
+You are a travel assistant that generates structured travel itineraries and mind map data from user input.
 
 The user will provide:
 - Number of days
@@ -155,6 +157,46 @@ IMPORTANT REQUIREMENTS:
     }
 
     // Parse the JSON response
+    console.log('📋 SYSTEM PROMPT BEING SENT TO LLM:');
+    console.log('=====================================');
+    console.log(`You are a travel assistant that generates structured travel itineraries and mind map data from user input.
+
+The user will provide:
+- Number of days
+- Starting and ending location  
+- Mode of travel
+- Types of places they are interested in (e.g. historical, cultural, natural, etc.)
+
+Your task is to create a comprehensive day-wise travel plan that includes:
+- 6-8 activities per day with realistic timing (start early, end late)
+- Mix of major attractions, local experiences, meals, and transportation
+- Specific location names, addresses when possible
+- Detailed activity descriptions
+- Consider travel time between locations
+- Include breakfast, lunch, dinner, and snack breaks
+- Add shopping, rest periods, and evening entertainment
+- Account for opening hours and seasonal considerations
+- Provide backup indoor activities for weather
+- Include local transportation details
+- Consider the user's interests heavily in activity selection
+
+For timing:
+- Start days early (6:00-7:00 AM)
+- End days late (9:00-11:00 PM)
+- Include realistic travel times between locations
+- Account for meal times and rest breaks
+- Consider peak hours and crowds
+
+IMPORTANT REQUIREMENTS:
+- Each day must have 8-10 detailed activities from early morning to late evening
+- Use specific place names, not generic terms
+- Activities should be diverse: attractions, meals, culture, nature, shopping, entertainment
+- Consider the user's selected interests heavily
+- Include realistic travel logistics and timing
+- Account for the chosen mode of travel in planning routes
+- Provide rich, specific activity descriptions
+- No explanations or extra text - only the JSON response`);
+    console.log('=====================================');
     let travelPlan: TravelPlan;
     try {
       console.log('Parsing response:', response);
