@@ -6,14 +6,26 @@ export interface TravelFormData {
   days: number;
   startLocation: string;
   endLocation: string;
-  travelMode: string[];
+  userDescription: string;
+  travelModes: string[];
   interests: string[];
+  customInterests: string;
+  enableTravelMode: boolean;
+  enableInterests: boolean;
 }
 
 export interface TravelNode {
   time: string;
   place: string;
   activity: string;
+  description?: string;
+  details?: {
+    address?: string;
+    openingHours?: string;
+    cost?: string;
+    tips?: string;
+    duration?: string;
+  };
 }
 
 export interface TravelDay {
@@ -23,7 +35,13 @@ export interface TravelDay {
 
 export interface TravelPlan {
   title: string;
+  overview: string;
   days: TravelDay[];
+  summary: {
+    totalCost?: string;
+    bestTimeToVisit?: string;
+    tips?: string[];
+  };
 }
 
 // Initialize Groq client
@@ -59,48 +77,68 @@ export const generateTravelPlan = async (formData: TravelFormData): Promise<Trav
   console.log('Form data:', formData);
   
   try {
-    const userPrompt = `Number of days: ${formData.days}
+    const userPrompt = `Number of days: ${formData.days} (maximum 5 days)
 Starting location: ${formData.startLocation}
-Ending location: ${formData.endLocation}
-Mode of travel: ${formData.travelMode}
-Interests: ${formData.interests.join(', ')}
+Ending location: ${formData.endLocation || 'Same as starting location'}
+User description: ${formData.userDescription}
+Transportation modes: ${formData.enableTravelMode ? formData.travelModes.join(', ') : 'Any suitable transport'}
+Interests: ${formData.enableInterests ? [...formData.interests, formData.customInterests].filter(Boolean).join(', ') : 'General sightseeing'}
 
-Please create a detailed travel itinerary.`;
+Please create a comprehensive travel itinerary with detailed information.`;
 
     const completion = await groq.chat.completions.create({
       messages: [
         {
           role: "system",
-          content: `You are a travel assistant that generates structured travel itineraries and mind map data from user input.
+          content: `You are an expert travel assistant that creates comprehensive, detailed travel itineraries.
 
 The user will provide:
-- Number of days
+- Number of days (1-5 days maximum)
 - Starting and ending location
-- Mode of travel
-- Types of places they are interested in (e.g. historical, cultural, natural, etc.)
+- Personal description of what they want
+- Transportation preferences (optional)
+- Interest categories (optional)
 
-Your task is to create a day-wise travel plan with clear time slots, activities, and locations. Then, convert this into a mind map–friendly format.
+Create a comprehensive travel plan with:
+- 8-12 activities per day from 6:00 AM to 10:00 PM
+- Specific place names, addresses, and detailed descriptions
+- Realistic timing with travel considerations
+- Mix of attractions, meals, culture, shopping, rest
+- Detailed information for each location
+- Complete trip overview and summary
 
-Respond only in this JSON format:
+IMPORTANT: Respond ONLY with this exact JSON format:
 {
-  "title": "Trip Title",
+  "title": "Comprehensive Trip Title",
+  "overview": "Detailed paragraph describing the entire trip, highlights, and what makes it special",
   "days": [
     {
       "day": "Day 1",
       "nodes": [
-        { "time": "6:00 AM", "place": "Place A", "activity": "Activity 1" },
-        { "time": "10:00 AM", "place": "Place B", "activity": "Activity 2" }
-      ]
-    },
-    {
-      "day": "Day 2",
-      "nodes": [
-        { "time": "9:00 AM", "place": "Place C", "activity": "Activity 3" }
+        { 
+          "time": "6:00 AM", 
+          "place": "Specific Place Name", 
+          "activity": "Detailed activity description",
+          "description": "Rich description of the place and experience",
+          "details": {
+            "address": "Full address",
+            "openingHours": "Opening hours",
+            "cost": "Estimated cost",
+            "tips": "Helpful tips",
+            "duration": "Time to spend"
+          }
+        }
       ]
     }
-  ]
+  ],
+  "summary": {
+    "totalCost": "Estimated total cost range",
+    "bestTimeToVisit": "Best time of year to visit",
+    "tips": ["Important tip 1", "Important tip 2", "Important tip 3"]
+  }
 }
-Keep all descriptions short. Do not return any explanation or extra text — only the JSON.`
+
+Make descriptions rich and detailed. Include specific restaurant names, exact attraction names, local transportation details, and insider tips. NO explanations outside the JSON.`
         },
         {
           role: "user",
